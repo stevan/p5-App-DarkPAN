@@ -25,7 +25,7 @@ sub execute {
 
     my $root = Path::Tiny::path( $opt->root );
 
-    die 'Not a DarkPAN repository: $root'
+    die "Not a DarkPAN repository: $root"
         unless -d $root->child('CPAN')
             && -d $root->child('QUAR')
             && -d $root->child('INBX');

@@ -23,7 +23,7 @@ sub execute {
 
     my $root = Path::Tiny::path( $opt->root );
 
-    die 'Cannot initialize DarkPAN repository unless directory ($root) is empty'
+    die "Cannot initialize DarkPAN repository unless directory ($root) is empty"
         unless 0 == scalar $root->children;
 
     my $cpan = $root->child('CPAN');
