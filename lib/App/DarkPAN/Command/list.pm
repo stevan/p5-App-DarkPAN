@@ -30,8 +30,7 @@ sub execute {
 
     die "Not a DarkPAN repository: $root"
         unless -d $root->child('CPAN')
-            && -d $root->child('QUAR')
-            && -d $root->child('INBX');
+            && -d $root->child('DBOX');
 
     my $cpan = $root->child('CPAN');
 

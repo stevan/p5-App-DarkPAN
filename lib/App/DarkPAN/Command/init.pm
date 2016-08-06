@@ -27,15 +27,13 @@ sub execute {
         unless 0 == scalar $root->children;
 
     my $cpan = $root->child('CPAN');
-    my $quar = $root->child('QUAR');
-    my $inbx = $root->child('INBX');
+    my $dbox = $root->child('DBOX');
 
     $cpan->mkpath;
-    $quar->mkpath;
-    $inbx->mkpath;
+    $dbox->mkpath;
 
     my $f = CPAN::Faker->new(
-        source => $quar->stringify,
+        source => $dbox->stringify,
         dest   => $cpan->stringify,
     );
 
