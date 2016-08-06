@@ -40,7 +40,7 @@ sub execute {
     if ( $opt->authors ) {
         my $pca = Parse::CPAN::Authors->new( $authors->stringify );
 
-        if ( my @authors = $pca->authors ) {
+        if ( my @authors = eval{ $pca->authors } ) {
             printf "Found %d authors.\n", scalar @authors;
             foreach my $author ( sort { $a->pauseid cmp $b->pauseid } @authors ) {
                 printf "%s %s %s\n", $author->pauseid, $author->email, $author->name;
