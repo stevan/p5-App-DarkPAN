@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::inspect;
+package App::DarkPAN::Command::list;
 
 use strict;
 use warnings;
@@ -16,8 +16,8 @@ use App::DarkPAN -command;
 sub opt_spec {
     my ($class) = @_;
     return (
-        [ 'packages',   'inspect packages' ],
-        [ 'authors',    'inspect authors' ],
+        [ 'packages',   'list packages' ],
+        [ 'authors',    'list authors' ],
         [],
         $class->SUPER::opt_spec,
     )
@@ -50,7 +50,8 @@ sub execute {
             print "No authors.\n"
         }
     }
-    elsif ( $opt->packages ) {
+
+    if ( $opt->packages ) {
         my $pcp = Parse::CPAN::Packages->new( $packages->stringify );
 
         if ( my @packages = $pcp->packages ) {
@@ -70,13 +71,13 @@ sub execute {
 
 __END__
 
-# ABSTRACT: Inspect a DarkPAN repository
+# ABSTRACT: List authors and packages in a DarkPAN repository
 
 =pod
 
 =head1 NAME
 
-App::DarkPAN::Command::inspect - Inspect a DarkPAN repository
+App::DarkPAN::Command::list - List authors and packages in a DarkPAN repository
 
 =head1 DESCRIPTION
 
