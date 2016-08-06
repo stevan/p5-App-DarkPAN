@@ -41,7 +41,7 @@ sub execute {
 
     $f->make_cpan;
 
-    print "CPAN created in $root";
+    print "DarkPAN created in ($root)\n";
 }
 
 1;
