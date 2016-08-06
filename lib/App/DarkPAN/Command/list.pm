@@ -33,12 +33,11 @@ sub execute {
             && -d $root->child('QUAR')
             && -d $root->child('INBX');
 
-    my $cpan     = $root->child('CPAN');
-    my $authors  = $cpan->child('authors/01mailrc.txt.gz');
-    my $packages = $cpan->child('modules/02packages.details.txt.gz');
+    my $cpan = $root->child('CPAN');
 
     if ( $opt->authors ) {
-        my $pca = Parse::CPAN::Authors->new( $authors->stringify );
+        my $authors = $cpan->child('authors/01mailrc.txt.gz');
+        my $pca     = Parse::CPAN::Authors->new( $authors->stringify );
 
         if ( my @authors = eval{ $pca->authors } ) {
             printf "Found %d authors.\n", scalar @authors;
@@ -52,7 +51,8 @@ sub execute {
     }
 
     if ( $opt->packages ) {
-        my $pcp = Parse::CPAN::Packages->new( $packages->stringify );
+        my $packages = $cpan->child('modules/02packages.details.txt.gz');
+        my $pcp      = Parse::CPAN::Packages->new( $packages->stringify );
 
         if ( my @packages = $pcp->packages ) {
             printf "Found %d packages.\n", scalar @packages;
