@@ -43,7 +43,7 @@ sub execute {
         if ( my @authors = $pca->authors ) {
             printf "Found %d authors.\n", scalar @authors;
             foreach my $author ( sort { $a->pauseid cmp $b->pauseid } @authors ) {
-                printf "%s : %s<%s>\n", $author->pauseid, $author->name, $author->email;
+                printf "%s %s %s\n", $author->pauseid, $author->email, $author->name;
             }
         }
         else {
@@ -56,7 +56,7 @@ sub execute {
         if ( my @packages = $pcp->packages ) {
             printf "Found %d packages.\n", scalar @packages;
             foreach my $pkg ( sort { $a->package cmp $b->package } @packages ) {
-                printf "%s %s\n", $pkg->package, $pkg->version;
+                printf "%s %s %s\n", $pkg->package, $pkg->version, $pkg->distribution->prefix;
             }
         }
         else {

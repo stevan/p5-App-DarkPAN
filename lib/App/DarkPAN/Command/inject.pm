@@ -38,7 +38,7 @@ sub execute {
         if ( my @modules = @{ $mcpi->{modulelist} } ) {
             printf "Found %d modules.\n", scalar @modules;
             foreach my $mod ( @modules ) {
-                print $mod, "\n";
+                print $mod =~ s/\s+/ /gr, "\n";
             }
         }
         else {
