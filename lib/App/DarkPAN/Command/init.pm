@@ -35,6 +35,18 @@ sub execute {
     my $f = CPAN::Faker->new(
         source => $dbox->stringify,
         dest   => $cpan->stringify,
+        # NOTE:
+        # Adding in the URL here because it
+        # was causing an warning occasionally
+        # when creating this object because
+        # the `url` field relies on the `dest`
+        # field, and order initialization order
+        # is undefined, so the `url` field should
+        # be marked lazy, but since this is
+        # just a temp thing, we can leave it
+        # here as a hack/fix.
+        # - SL
+        url    => ('file://' . $cpan->stringify . '/'),
     );
 
     $f->make_cpan;
