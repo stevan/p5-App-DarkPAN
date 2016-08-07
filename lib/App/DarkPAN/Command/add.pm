@@ -41,7 +41,7 @@ sub execute {
 
     my $module = $meta->{name} =~ s/-/::/gr; # /
     my $mcpi   = CPAN::Mini::Inject->new;
-    $mcpi->parsecfg;
+    $mcpi->parsecfg( $root->child('mcpani.config')->stringify );
     $mcpi->readlist;
     $mcpi->add(
         file     => $file->stringify,

@@ -30,7 +30,7 @@ sub execute {
             && -d $root->child('DBOX');
 
     my $mcpi = CPAN::Mini::Inject->new;
-    $mcpi->parsecfg;
+    $mcpi->parsecfg( $root->child('mcpani.config') );
 
     if ( $opt->dry_run ) {
         $mcpi->readlist;

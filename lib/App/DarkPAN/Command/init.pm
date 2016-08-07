@@ -51,6 +51,20 @@ sub execute {
 
     $f->make_cpan;
 
+    # NOTE:
+    # Eventually we should get rid of
+    # our usage of Mini::CPAN::Inject
+    # in which case, this crap can go.
+    # - SL
+    my $mcpi_congig = $root->child('mcpani.config');
+    $mcpi_congig->spew(
+qq[remote: ftp://ftp.cpan.org/pub/CPAN
+passive: yes
+dirmode: 0755
+local: $cpan
+repository: $dbox
+]);
+
     print "DarkPAN created in ($root)\n";
 }
 
