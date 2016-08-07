@@ -1,5 +1,7 @@
 #!perl -w
 
+# PODNAME: bin/darkpan
+
 use strict;
 use warnings;
 use FindBin;
@@ -12,9 +14,4 @@ App::DarkPAN->new->run;
 
 1;
 
-__END__
-
-=pod
-
-=cut
 

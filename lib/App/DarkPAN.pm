@@ -24,6 +24,12 @@ use App::Cmd::Setup -app => {
 
 __END__
 
+# ABSTRACT: Create and manage DarkPAN repositories.
+
 =pod
+
+=head1 NAME
+
+App::DarkPAN - Create and manage DarkPAN repositories.
 
 =cut
