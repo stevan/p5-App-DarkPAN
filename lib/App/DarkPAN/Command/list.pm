@@ -74,10 +74,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-App::DarkPAN::Command::list - List authors and packages in a DarkPAN repository
-
 =head1 DESCRIPTION
 
 =cut

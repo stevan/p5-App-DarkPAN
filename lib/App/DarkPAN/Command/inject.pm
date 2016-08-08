@@ -57,10 +57,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-App::DarkPAN::Command::inject - Inject modules into a DarkPAN repository
-
 =head1 DESCRIPTION
 
 =cut

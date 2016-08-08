@@ -20,10 +20,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-App::DarkPAN::Command::tutorial - Tutorial about how to setup and use a DarkPAN repository
-
 =head1 DESCRIPTION
 
   > darkpan init --root ~/DarkPAN/

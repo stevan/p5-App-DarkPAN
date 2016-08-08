@@ -72,10 +72,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-App::DarkPAN::Command::add - Add module to a DarkPAN repository
-
 =head1 DESCRIPTION
 
 =cut

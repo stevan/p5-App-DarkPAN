@@ -29,10 +29,6 @@ __END__
 
 =pod
 
-=head1 NAME
-
-App::DarkPAN::Command - Base command class
-
 =head1 DESCRIPTION
 
 =cut
