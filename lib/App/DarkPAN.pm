@@ -28,8 +28,12 @@ __END__
 
 =pod
 
-=head1 NAME
+=head1 DESCRIPTION
 
-App::DarkPAN - Create and manage DarkPAN repositories.
+This application makes it simple to create and populate a DarkPAN
+repostitory which can be used by all available CPAN clients to
+install local non-public modules.
+
+The power of CPAN in an App!
 
 =cut
