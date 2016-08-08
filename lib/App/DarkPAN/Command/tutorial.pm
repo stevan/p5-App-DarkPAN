@@ -35,12 +35,17 @@ __END__
   No authors.
   No packages.
 
-  > darkpan inject --root ~/DarkPAN/ --dry-run
+  > darkpan inject --review
   Found 2 modules.
   Path::Tiny 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
   Path::Tiny::Error 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
 
-  > darkpan inject --root ~/DarkPAN/
+  > darkpan inject
+  Found 2 modules.
+  Path::Tiny 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
+  Path::Tiny::Error 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
+  Injected 2 modules into DarkPAN.
+
 
   > darkpan list --root ~/DarkPAN/ --authors --packages
   Found 1 authors.

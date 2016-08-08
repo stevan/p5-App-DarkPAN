@@ -14,7 +14,7 @@ use App::DarkPAN -command;
 sub opt_spec {
     my ($class) = @_;
     return (
-        [ 'dry-run', 'List the staged modules, but do not inject them' ],
+        [ 'review', 'List the staged modules, but do not inject them' ],
         [],
         $class->SUPER::opt_spec,
     )
@@ -31,20 +31,22 @@ sub execute {
 
     my $mcpi = CPAN::Mini::Inject->new;
     $mcpi->parsecfg( $root->child('mcpani.config') );
+    $mcpi->readlist;
 
-    if ( $opt->dry_run ) {
-        $mcpi->readlist;
-        if ( my @modules = @{ $mcpi->{modulelist} } ) {
-            printf "Found %d modules.\n", scalar @modules;
-            foreach my $mod ( @modules ) {
-                print $mod =~ s/\s+/ /gr, "\n";
-            }
-        }
-        else {
-            print "No modules.\n"
+    my $num_modules;
+    if ( my @modules = @{ $mcpi->{modulelist} } ) {
+        $num_modules = scalar @modules;
+        print "Found $num_modules modules.\n";
+        foreach my $mod ( @modules ) {
+            print $mod =~ s/\s+/ /gr, "\n";
         }
     }
     else {
+        print "No modules.\n"
+    }
+
+    if ( not $opt->review ) {
+        print "Injected $num_modules modules into DarkPAN.\n";
         $mcpi->inject;
     }
 }
