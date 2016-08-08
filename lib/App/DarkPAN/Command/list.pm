@@ -9,7 +9,8 @@ our $AUTHORITY = 'cpan:STEVAN';
 use Path::Tiny ();
 
 use Parse::CPAN::Packages ();
-use Parse::CPAN::Authors  ();
+
+use App::DarkPAN::Model;
 
 use App::DarkPAN -command;
 
@@ -35,13 +36,14 @@ sub execute {
     my $cpan = $root->child('CPAN');
 
     if ( $opt->authors ) {
-        my $authors = $cpan->child('authors/01mailrc.txt.gz');
-        my $pca     = Parse::CPAN::Authors->new( $authors->stringify );
 
-        if ( my @authors = eval{ $pca->authors } ) {
+        my $m = App::DarkPAN::Model->new( root => $root );
+        my $a = $m->authors;
+
+        if ( my @authors = $a->get_all ) {
             printf "Found %d authors.\n", scalar @authors;
-            foreach my $author ( sort { $a->pauseid cmp $b->pauseid } @authors ) {
-                printf "%s %s %s\n", $author->pauseid, $author->email, $author->name;
+            foreach my $author ( sort { $a->{pauseid} cmp $b->{pauseid} } @authors ) {
+                printf "%s \"%s <%s>\"\n", $author->{pauseid}, $author->{name}, $author->{email};
             }
         }
         else {
