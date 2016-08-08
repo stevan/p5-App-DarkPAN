@@ -22,16 +22,18 @@ __END__
 
 =head1 DESCRIPTION
 
-  > darkpan init --root ~/DarkPAN/
-  DarkPAN created in (/Users/stevan/Desktop/dpan)
+  > cd ~/DarkPAN/ # optionally we can add `--root ~/DarkPAN/` to all commands
 
-  > darkpan list --root ~/DarkPAN/ --authors --packages
+  > darkpan init
+  DarkPAN created in (~/DarkPAN/dpan)
+
+  > darkpan list --authors --packages
   No authors.
   No packages.
 
   > darkpan submit --author DGOLDEN --file ~/Downloads/Path-Tiny-0.096.tar.gz
 
-  > darkpan list --root ~/DarkPAN/ --authors --packages
+  > darkpan list --authors --packages
   No authors.
   No packages.
 
@@ -47,7 +49,7 @@ __END__
   Injected 2 modules into DarkPAN.
 
 
-  > darkpan list --root ~/DarkPAN/ --authors --packages
+  > darkpan list --authors --packages
   Found 1 authors.
   DGOLDEN CENSORED Custom Non-CPAN author
   Found 2 packages.
