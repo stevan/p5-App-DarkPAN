@@ -29,7 +29,7 @@ __END__
   No authors.
   No packages.
 
-  > darkpan add --root ~/DarkPAN/ --author DGOLDEN --file ~/Downloads/Path-Tiny-0.096.tar.gz
+  > darkpan submit --author DGOLDEN --file ~/Downloads/Path-Tiny-0.096.tar.gz
 
   > darkpan list --root ~/DarkPAN/ --authors --packages
   No authors.

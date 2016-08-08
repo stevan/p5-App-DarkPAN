@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::add;
+package App::DarkPAN::Command::submit;
 
 use strict;
 use warnings;
@@ -17,7 +17,7 @@ use App::DarkPAN -command;
 sub opt_spec {
     my ($class) = @_;
     return (
-        [ 'file=s',   'file to add to DarkPAN' ],
+        [ 'file=s',   'file to submit to DarkPAN' ],
         [ 'author=s', 'PAUSE author name' ],
         [],
         $class->SUPER::opt_spec,
@@ -68,7 +68,7 @@ sub load_metayaml {
 
 __END__
 
-# ABSTRACT: Add module to a DarkPAN repository
+# ABSTRACT: Submit module to a DarkPAN repository
 
 =pod
 
