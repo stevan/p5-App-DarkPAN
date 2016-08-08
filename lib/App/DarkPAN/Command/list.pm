@@ -10,8 +10,6 @@ use Path::Tiny ();
 
 use Parse::CPAN::Packages ();
 
-use App::DarkPAN::Model;
-
 use App::DarkPAN -command;
 
 sub opt_spec {
@@ -36,19 +34,7 @@ sub execute {
     my $cpan = $root->child('CPAN');
 
     if ( $opt->authors ) {
-
-        my $m = App::DarkPAN::Model->new( root => $root );
-        my $a = $m->authors;
-
-        if ( my @authors = $a->get_all ) {
-            printf "Found %d authors.\n", scalar @authors;
-            foreach my $author ( sort { $a->{pauseid} cmp $b->{pauseid} } @authors ) {
-                printf "%s \"%s <%s>\"\n", $author->{pauseid}, $author->{name}, $author->{email};
-            }
-        }
-        else {
-            print "No authors.\n"
-        }
+        print "See the `authors` command for this now.\n";
     }
 
     if ( $opt->packages ) {
@@ -72,7 +58,7 @@ sub execute {
 
 __END__
 
-# ABSTRACT: List authors and packages in a DarkPAN repository
+# ABSTRACT: List packages in a DarkPAN repository
 
 =pod
 

@@ -8,8 +8,15 @@ our $AUTHORITY = 'cpan:STEVAN';
 
 use Path::Tiny   ();
 use Scalar::Util ();
+use JSON::XS     ();
 
 use App::DarkPAN::Model::Authors;
+
+# ... some gloablly used stuff
+
+our $JSON = JSON::XS->new->utf8->pretty->canonical;
+
+# ...
 
 sub new {
     my ($class, %args) = @_;

@@ -23,12 +23,24 @@ sub _new {
 
 sub get_all {
     my $self = $_[0];
-    return values %{ $self->{data} };
+    return sort { $a->{pauseid} cmp $b->{pauseid} } values %{ $self->{data} };
 }
 
 sub get {
     my ($self, $pauseid) = @_;
     return $self->{data}->{ $pauseid };
+}
+
+sub has {
+    my ($self, $pauseid) = @_;
+    return exists $self->{data}->{ $pauseid };
+}
+
+sub set {
+    my ($self, $pauseid, $data) = @_;
+    foreach my $k ( keys %$data ) {
+        $self->{data}->{ $pauseid }->{ $k } = $data->{ $k };
+    }
 }
 
 sub load {
