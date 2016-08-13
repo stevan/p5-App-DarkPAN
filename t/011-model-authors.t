@@ -58,6 +58,10 @@ subtest '... reading authors model confirming the above worked' => sub {
     my $data = $authors->get('STEVAN');
     is_deeply($data, $STEVAN, '... got the same data back out');
     isnt($data, $STEVAN, '... but different instances');
+
+    my @all = $authors->get_all;
+    is(scalar(@all), 1, '... there is only one author in the list');
+    is_deeply($all[0], { pauseid => 'STEVAN', %$STEVAN }, '... got the data back out with pauseid added');
 };
 
 

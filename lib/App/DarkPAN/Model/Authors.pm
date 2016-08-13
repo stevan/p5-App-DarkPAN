@@ -25,7 +25,10 @@ sub _new {
 
 sub get_all {
     my $self = $_[0];
-    return sort { $a->{pauseid} cmp $b->{pauseid} } values %{ $self->{data} };
+    return
+        sort { $a->{pauseid} cmp $b->{pauseid} }
+        map  { $self->{data}->{ $_ }->{pauseid} = $_; $self->{data}->{ $_ } }
+        keys %{ $self->{data} };
 }
 
 sub get {
