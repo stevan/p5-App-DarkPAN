@@ -20,7 +20,7 @@ sub opt_spec {
         [],
         [ 'select',    'select the author(s)' ],
         [ 'update',    'update the author' ],
-        [ 'delete',    'delete the author' ],
+        # [ 'delete',    'delete the author' ],
         [],
         $class->SUPER::opt_spec,
     )
