@@ -25,10 +25,7 @@ sub _new {
 
 sub get_all {
     my $self = $_[0];
-    return
-        sort { $a->{pauseid} cmp $b->{pauseid} }
-        map  +{ %{ $self->{data}->{ $_ } }, pauseid => $_ },
-        keys %{ $self->{data} };
+    return sort { $a->{pauseid} cmp $b->{pauseid} } values %{ $self->{data} };
 }
 
 sub get {
@@ -78,6 +75,7 @@ sub load {
         my ($name, $email) = $long =~ /(.*) <(.+)>$/;
 
         $data->{$pauseid} = {
+            pauseid => $pauseid,
             name    => $name,
             email   => $email,
         };
