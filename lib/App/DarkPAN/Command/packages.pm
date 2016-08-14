@@ -92,7 +92,7 @@ sub display_package {
 
 __END__
 
-# ABSTRACT: Perform operations on the Authors data
+# ABSTRACT: Perform operations on the Packages data
 
 =pod
 
