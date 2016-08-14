@@ -12,6 +12,7 @@ BEGIN {
 }
 
 my $Moose = {
+    package       => 'Moose',
     version       => '0.01',
     dist_filename => 'authors/id/S/ST/STEVAN/Moose-0.01.tar.gz'
 };
@@ -64,7 +65,7 @@ subtest '... reading packages model confirming the above worked' => sub {
 
     my @all = $packages->get_all;
     is(scalar(@all), 1, '... there is only one author in the list');
-    is_deeply($all[0], { package => 'Moose', %$Moose }, '... got the data back out with package added');
+    is_deeply($all[0], $Moose, '... got the data back out with package added');
 };
 
 

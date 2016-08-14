@@ -27,10 +27,7 @@ sub _new {
 
 sub get_all {
     my $self = $_[0];
-    return
-        sort { $a->{package} cmp $b->{package} }
-        map  +{ %{$self->{data}->{ $_ } }, package => $_ },
-        keys %{ $self->{data} };
+    return sort { $a->{package} cmp $b->{package} } values %{ $self->{data} };
 }
 
 sub get {
@@ -84,6 +81,7 @@ sub load {
     foreach my $line ( @lines ) {
         my ( $name, $version, $dist_filename ) = split ' ', $line;
         $data->{$name} = {
+            package       => $name,
             version       => $version,
             dist_filename => $dist_filename,
         };
