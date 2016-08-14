@@ -11,6 +11,7 @@ use Scalar::Util ();
 use JSON::XS     ();
 
 use App::DarkPAN::Model::Authors;
+use App::DarkPAN::Model::Packages;
 
 # ... some gloablly used stuff
 
@@ -34,6 +35,13 @@ sub authors {
     my ($self) = @_;
     return App::DarkPAN::Model::Authors->load(
         $self->{root}->child('CPAN/authors/01mailrc.txt.gz')
+    )
+}
+
+sub packages {
+    my ($self) = @_;
+    return App::DarkPAN::Model::Packages->load(
+        $self->{root}->child('CPAN/modules/02packages.details.txt.gz')
     )
 }
 
