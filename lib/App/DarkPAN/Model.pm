@@ -33,8 +33,8 @@ sub new {
 
 sub authors {
     my ($self) = @_;
-    return App::DarkPAN::Model::Authors->load(
-        $self->{root}->child('CPAN/authors/01mailrc.txt.gz')
+    return App::DarkPAN::Model::Authors->new(
+        file => $self->{root}->child('CPAN/authors/01mailrc.txt.gz')
     )
 }
 

@@ -42,8 +42,11 @@ sub execute {
     if ( $opt->select ) {
 
         if ( $pauseid ) {
-            if ( my $author = $authors->get( $pauseid ) ) {
+            if ( my $author = $authors->fetch( $pauseid ) ) {
                 $self->display_author( $author );
+            }
+            elsif ( my @authors = $authors->find( $pauseid ) ) {
+                $self->display_author( $_ ) foreach @authors;
             }
             else {
                 print "Unable to find author for ($pauseid)\n";

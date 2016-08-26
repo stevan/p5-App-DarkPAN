@@ -24,10 +24,8 @@ subtest '... creating simple authors model' => sub {
     isa_ok($authors, 'App::DarkPAN::Model::Authors');
 
     my $authors_file = $temp_dir->child('CPAN/authors/01mailrc.txt.gz');
-    ok(not( -e $authors_file ), '... the file has not been created yet');
-
-    $authors->store;
-    ok(-e $authors_file, '... the file has now been created');
+    ok(-e $authors_file, '... the file has been created yet');
+    is(0, -s $authors_file, '... the file but it is empty');
 };
 
 subtest '... reading empty authors model, adding to it and saving' => sub {
@@ -38,13 +36,11 @@ subtest '... reading empty authors model, adding to it and saving' => sub {
     my $authors = $m->authors;
     isa_ok($authors, 'App::DarkPAN::Model::Authors');
 
-    $authors->set('STEVAN' => $STEVAN);
+    $authors->upsert($STEVAN);
 
-    my $data = $authors->get('STEVAN');
+    my $data = $authors->fetch('STEVAN');
     is_deeply($data, $STEVAN, '... got the same data back out');
     isnt($data, $STEVAN, '... but different instances');
-
-    $authors->store;
 };
 
 subtest '... reading authors model confirming the above worked' => sub {
@@ -55,11 +51,11 @@ subtest '... reading authors model confirming the above worked' => sub {
     my $authors = $m->authors;
     isa_ok($authors, 'App::DarkPAN::Model::Authors');
 
-    my $data = $authors->get('STEVAN');
+    my $data = $authors->fetch('STEVAN');
     is_deeply($data, $STEVAN, '... got the same data back out');
     isnt($data, $STEVAN, '... but different instances');
 
-    my @all = $authors->get_all;
+    my @all = $authors->fetch_all;
     is(scalar(@all), 1, '... there is only one author in the list');
     is_deeply($all[0], $STEVAN, '... got the data back out');
 };
