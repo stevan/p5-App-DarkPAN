@@ -120,8 +120,7 @@ sub open_file_for_reading {
 sub open_file_for_writing {
     my ($self, $file) = @_;
     my $fh = $self->SUPER::open_file_for_writing( $file );
-    $fh->print( $self->_write_package_file_header( 100 ) );
-    $fh->print("\n");
+    $self->_write_package_file_header( $fh );
     return $fh;
 }
 
@@ -139,7 +138,7 @@ sub _skip_package_file_header {
 }
 
 sub _write_package_file_header {
-    my ($self, $line_count) = @_;
+    my ($self, $fh) = @_;
 
     my @header = (
         'File'         => '02packages.details.txt',
@@ -147,19 +146,25 @@ sub _write_package_file_header {
         'Description'  => 'Package names found in directory $CPAN/authors/id/',
         'Columns'      => 'package name, version, path',
         'Intended-For' => 'Automated fetch routines, namespace documentation.',
-        'Written-By'   => (__PACKAGE__.' version '.$VERSION),
-        'Line-Count'   => $line_count,
+        'Written-By'   => (Scalar::Util::blessed($self).' version '.$self->VERSION),
         'Last-Updated' => ((scalar gmtime).' GMT'),
+        # FIXME: 
+        # We want to write this very early
+        # which is a problem, so we need to 
+        # think about how to handle this.
+        # - SL
+        # 'Line-Count'   => $line_count,
     );
-
-    my $header = '';
 
     while (@header) {
         my ($key, $value) = (shift(@header), shift(@header));
-        $header .= sprintf "%15s %s\n" => ($key.':'), $value;
+        $fh->print( sprintf "%15s %s\n" => ($key.':'), $value );
     }
+    
+    # add in the blank line
+    $fh->print("\n");
 
-    return $header;
+    return;
 }
 
 # ...
