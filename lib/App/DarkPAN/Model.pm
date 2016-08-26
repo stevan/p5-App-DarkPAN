@@ -40,8 +40,8 @@ sub authors {
 
 sub packages {
     my ($self) = @_;
-    return App::DarkPAN::Model::Packages->load(
-        $self->{root}->child('CPAN/modules/02packages.details.txt.gz')
+    return App::DarkPAN::Model::Packages->new(
+        file => $self->{root}->child('CPAN/modules/02packages.details.txt.gz')
     )
 }
 

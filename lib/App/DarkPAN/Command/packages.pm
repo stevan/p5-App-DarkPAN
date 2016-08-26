@@ -42,15 +42,18 @@ sub execute {
     if ( $opt->select ) {
 
         if ( $package ) {
-            if ( my $package = $packages->get( $package ) ) {
-                $self->display_package( $package );
+            if ( my $p = $packages->fetch( $package ) ) {
+                $self->display_package( $p );
+            }
+            elsif ( my @packages = $packages->find( $package ) ) {
+                $self->display_package( $_ ) foreach @packages;
             }
             else {
                 print "Unable to find entry for ($package)\n";
             }
         }
         else {
-            if ( my @packages = $packages->get_all ) {
+            if ( my @packages = $packages->fetch_all ) {
                 printf "Found %d packages.\n", scalar @packages;
                 $self->display_package( $_ ) foreach @packages;
             }

@@ -6,121 +6,139 @@ use warnings;
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Path::Tiny         ();
-use Scalar::Util       ();
-use IO::Zlib           ();
 use CPAN::DistnameInfo ();
 
-sub new; # use load or create
-
-sub _new {
-    my ($class, %args) = @_;
-
-    return bless {
-        file   => $args{file},
-        header => {}, # TODO: add support for header data ..
-        data   => {},
-    } => $class;
-}
+use parent 'App::DarkPAN::Model::Core::CompressedDataFile';
 
 ## ...
 
-sub get_all {
-    my $self = $_[0];
-    return sort { $a->{package} cmp $b->{package} } values %{ $self->{data} };
-}
-
-sub get {
-    my ($self, $package) = @_;
-    return $self->{data}->{ $package };
-}
-
-sub has {
-    my ($self, $package) = @_;
-    return exists $self->{data}->{ $package };
-}
-
-sub set {
-    my ($self, $package, $data) = @_;
-    $self->{data}->{ $package } ||= {};
-    foreach my $k ( keys %$data ) {
-        $self->{data}->{ $package }->{ $k } = $data->{ $k };
+sub fetch_all {
+    my ($self) = @_;
+    
+    my $fh = $self->open_file_for_reading( $self->{file} );
+    
+    my @packages;
+    while ( my $line = $fh->getline ) {
+        push @packages => $self->_parse_line( $line );
     }
-}
-
-## ...
-
-sub load {
-    my ($class, $file) = @_;
-
-    $file = Path::Tiny::path( $file )
-        unless Scalar::Util::blessed( $file )
-            && $file->isa('Path::Tiny');
-
-    my $self = $class->_new( file => $file );
-
-    # if the file doesn't exist, then
-    # we just create the object and
-    # it will get created when saved
-    return $self unless -e $file;
-
-    my $fh = IO::Zlib->new( $self->{file}->stringify, 'rb' );
-    die "Failed to open file for reading - $file: $!" unless $fh;
-    my @lines = <$fh>;
+    
     $fh->close;
-
-    # TODO: handle header lines, but for
-    # now, we just skip header lines
-    while ( @lines ) {
-        my $line = shift @lines;
-        last if     $line =~ /^\s*$/;        # last if blank line
-        next unless $line =~ /^[^:]+:\s*.*/; # continue if in `key: value` still
-    }
-
-    my $data = $self->{data};
-    foreach my $line ( @lines ) {
-        next unless $line;
-        
-        my ( $name, $version, $dist_filename ) = split ' ', $line;
-        next unless $name;
-        
-        $data->{$name} = {
-            package       => $name,
-            version       => $version,
-            dist_filename => $dist_filename,
-        };
-    }
-
-    return $self;
+    
+    return sort { $a->{package} cmp $b->{package} } @packages;    
 }
 
-sub store {
-    my $self = shift;
+sub fetch {
+    my ($self, $name) = @_;
+    
+    my $fh = $self->open_file_for_reading( $self->{file} );
+    
+    my $package;
+    while ( my $line = $fh->getline ) {
+        if ( $line =~ /^$name\s/) {
+            $package = $self->_parse_line( $line );
+            last;
+        }
+    }
+    
+    $fh->close;
+    
+    return $package;
+}
 
-    # create the parent directory as needed...
-    $self->{file}->parent->mkpath unless -e $self->{file}->parent;
+sub find {
+    my ($self, $name_pattern) = @_;
+    
+    my $fh = $self->open_file_for_reading( $self->{file} );
+    
+    my @packages;
+    while ( my $line = $fh->getline ) {
+        if ( $line =~ /^$name_pattern/) {    
+            push @packages => $self->_parse_line( $line );
+        }
+    }
+    
+    $fh->close;
+    
+    return @packages;
+}
 
-    my %index = %{ $self->{data} };
-    my @lines = map sprintf(
-        "%-34s %5s  %s\n",
-        $_,
-        $index{ $_ }->{version} // 'undef',
-        $index{ $_ }->{dist_filename}
-    ), sort keys %index;
+sub upsert {
+    my ($self, $package) = @_;
+    
+    my $found        = 0;
+    my $package_name = $package->{package};
+    
+    $self->write_changes_to_file(
+        per_line => sub {
+            my ($input) = @_;
+            if ( $input =~ /^$package_name\s/ ) {
+                # just replace it with the new package
+                # info if we match it 
+                $found++;          
+                return $self->_unparse_line( $package );    
+            }
+            # otherwise just pass through ...
+            return $input;
+        },
+        post => sub {
+            my ($in, $out) = @_;
+            # if we didn't find it already, it is 
+            # new so we need to add it to the end.
+            $out->print( $self->_unparse_line( $package ) )
+                unless $found;
+        }
+    );
+    
+    return;
+}
 
-    my $out = IO::Zlib->new( $self->{file}->stringify, 'wb' );
-    die "Failed to open file for writing - $self->{file}: $!" unless $out;
-    $out->print( $self->_package_file_header( scalar @lines ) );
-    $out->print("\n"); # blank line
-    $out->print( $_ ) foreach @lines;
-    $out->close;
-
-    return $self;
+sub delete {
+    my ($self, $package_name) = @_;
+    
+    $self->write_changes_to_file(
+        per_line => sub {
+            my ($input) = @_;
+            # return nothing, so we skip the line ...
+            return if $input =~ /^$package_name\s/;
+            # otherwise just pass through ....
+            return $input;
+        },
+    );
+    
+    return;
 }
 
 ## ...
 
-sub _package_file_header {
+sub open_file_for_reading {
+    my ($self, $file) = @_;
+    my $fh = $self->SUPER::open_file_for_reading( $file );
+    $self->_skip_package_file_header( $fh );
+    return $fh;
+}
+
+sub open_file_for_writing {
+    my ($self, $file) = @_;
+    my $fh = $self->SUPER::open_file_for_writing( $file );
+    $fh->print( $self->_write_package_file_header( 100 ) );
+    $fh->print("\n");
+    return $fh;
+}
+
+## ...
+
+sub _skip_package_file_header {
+    my ($self, $fh) = @_;
+    
+    while ( my $line = $fh->getline ) {
+        last if $line =~ /^\s*$/;        # last if blank line
+        next if $line =~ /^[^:]+:\s*.*/; # continue if in `key: value` still
+    }
+    
+    return;
+}
+
+sub _write_package_file_header {
     my ($self, $line_count) = @_;
 
     my @header = (
@@ -143,6 +161,32 @@ sub _package_file_header {
 
     return $header;
 }
+
+# ...
+
+sub _parse_line {
+    my ($self, $line) = @_;
+    
+    my ( $name, $version, $dist_filename ) = split ' ', $line;  
+    die "Unable to parse line: $line" unless $name;
+    
+    return +{
+        package       => $name,
+        version       => $version,
+        dist_filename => $dist_filename,
+    };
+}
+
+sub _unparse_line {
+    my ($self, $package) = @_;
+    return sprintf
+        "%-34s %5s  %s\n",
+        $package->{package},
+        $package->{version} // 'undef',
+        $package->{dist_filename}
+    ;
+}
+
 
 1;
 

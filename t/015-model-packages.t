@@ -28,10 +28,8 @@ subtest '... creating simple packages model' => sub {
     isa_ok($packages, 'App::DarkPAN::Model::Packages');
 
     my $packages_file = $temp_dir->child('CPAN/modules/02packages.details.txt.gz');
-    ok(not( -e $packages_file ), '... the file has not been created yet');
-
-    $packages->store;
-    ok(-e $packages_file, '... the file has now been created');
+    ok(-e $packages_file, '... the file has been created yet');
+    is(0, -s $packages_file, '... the file but it is empty');
 };
 
 subtest '... reading empty packages model, adding to it and saving' => sub {
@@ -42,13 +40,11 @@ subtest '... reading empty packages model, adding to it and saving' => sub {
     my $packages = $m->packages;
     isa_ok($packages, 'App::DarkPAN::Model::Packages');
 
-    $packages->set('Moose' => $Moose);
+    $packages->upsert($Moose);
 
-    my $data = $packages->get('Moose');
+    my $data = $packages->fetch('Moose');
     is_deeply($data, $Moose, '... got the same data back out');
     isnt($data, $Moose, '... but different instances');
-
-    $packages->store;
 };
 
 subtest '... reading packages model confirming the above worked' => sub {
@@ -59,11 +55,11 @@ subtest '... reading packages model confirming the above worked' => sub {
     my $packages = $m->packages;
     isa_ok($packages, 'App::DarkPAN::Model::Packages');
 
-    my $data = $packages->get('Moose');
+    my $data = $packages->fetch('Moose');
     is_deeply($data, $Moose, '... got the same data back out');
     isnt($data, $Moose, '... but different instances');
 
-    my @all = $packages->get_all;
+    my @all = $packages->fetch_all;
     is(scalar(@all), 1, '... there is only one author in the list');
     is_deeply($all[0], $Moose, '... got the data back out with package added');
 };
