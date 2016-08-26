@@ -20,7 +20,7 @@ BEGIN {
         use_ok('App::DarkPAN::Command::submit');
 
         use_ok('App::DarkPAN::Command::authors');
-        use_ok('App::DarkPAN::Command::list');
+        use_ok('App::DarkPAN::Command::packages');
 
         use_ok('App::DarkPAN::Command::tutorial');
 }
