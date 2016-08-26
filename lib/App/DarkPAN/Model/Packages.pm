@@ -79,7 +79,11 @@ sub load {
 
     my $data = $self->{data};
     foreach my $line ( @lines ) {
+        next unless $line;
+        
         my ( $name, $version, $dist_filename ) = split ' ', $line;
+        next unless $name;
+        
         $data->{$name} = {
             package       => $name,
             version       => $version,
