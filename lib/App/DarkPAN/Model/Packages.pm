@@ -6,109 +6,35 @@ use warnings;
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use CPAN::DistnameInfo ();
-
 use parent 'App::DarkPAN::Model::Core::CompressedDataFile';
 
-## ...
+## ... overridden methods 
 
 sub fetch_all {
     my ($self) = @_;
-    
-    my $fh = $self->open_file_for_reading( $self->{file} );
-    
-    my @packages;
-    while ( my $line = $fh->getline ) {
-        push @packages => $self->_parse_line( $line );
-    }
-    
-    $fh->close;
-    
-    return sort { $a->{package} cmp $b->{package} } @packages;    
+    return sort { $a->{package} cmp $b->{package} } $self->SUPER::fetch_all;    
 }
 
 sub fetch {
     my ($self, $name) = @_;
-    
-    my $fh = $self->open_file_for_reading( $self->{file} );
-    
-    my $package;
-    while ( my $line = $fh->getline ) {
-        if ( $line =~ /^$name\s/) {
-            $package = $self->_parse_line( $line );
-            last;
-        }
-    }
-    
-    $fh->close;
-    
-    return $package;
+    return $self->SUPER::fetch( qr/^$name\s/ )
 }
 
 sub find {
     my ($self, $name_pattern) = @_;
-    
-    my $fh = $self->open_file_for_reading( $self->{file} );
-    
-    my @packages;
-    while ( my $line = $fh->getline ) {
-        if ( $line =~ /^$name_pattern/) {    
-            push @packages => $self->_parse_line( $line );
-        }
-    }
-    
-    $fh->close;
-    
-    return @packages;
+    return $self->SUPER::fetch( qr/^$name_pattern/ );
 }
 
 sub upsert {
     my ($self, $package) = @_;
-    
-    my $found        = 0;
     my $package_name = $package->{package};
-    
-    $self->write_changes_to_file(
-        per_line => sub {
-            my ($input) = @_;
-            if ( $input =~ /^$package_name\s/ ) {
-                # just replace it with the new package
-                # info if we match it 
-                $found++;          
-                return $self->_unparse_line( $package );    
-            }
-            # otherwise just pass through ...
-            return $input;
-        },
-        post => sub {
-            my ($in, $out) = @_;
-            # if we didn't find it already, it is 
-            # new so we need to add it to the end.
-            $out->print( $self->_unparse_line( $package ) )
-                unless $found;
-        }
-    );
-    
-    return;
+    return $self->SUPER::upsert( qr/^$package_name\s/, $package );
 }
 
 sub delete {
     my ($self, $package_name) = @_;
-    
-    $self->write_changes_to_file(
-        per_line => sub {
-            my ($input) = @_;
-            # return nothing, so we skip the line ...
-            return if $input =~ /^$package_name\s/;
-            # otherwise just pass through ....
-            return $input;
-        },
-    );
-    
-    return;
+    return $self->SUPER::delete( qr/^$package_name\s/ );
 }
-
-## ...
 
 sub open_file_for_reading {
     my ($self, $file) = @_;
@@ -124,7 +50,32 @@ sub open_file_for_writing {
     return $fh;
 }
 
-## ...
+# ... abstract methods
+
+sub unpack_line_into_data {
+    my ($self, $line) = @_;
+    
+    my ( $name, $version, $dist_filename ) = split ' ', $line;  
+    die "Unable to parse line: $line" unless $name;
+    
+    return +{
+        package       => $name,
+        version       => $version,
+        dist_filename => $dist_filename,
+    };
+}
+
+sub pack_data_into_line {
+    my ($self, $package) = @_;
+    return sprintf
+        "%-34s %5s  %s\n",
+        $package->{package},
+        $package->{version} // 'undef',
+        $package->{dist_filename}
+    ;
+}
+
+## ... private methods 
 
 sub _skip_package_file_header {
     my ($self, $fh) = @_;
@@ -166,32 +117,6 @@ sub _write_package_file_header {
 
     return;
 }
-
-# ...
-
-sub _parse_line {
-    my ($self, $line) = @_;
-    
-    my ( $name, $version, $dist_filename ) = split ' ', $line;  
-    die "Unable to parse line: $line" unless $name;
-    
-    return +{
-        package       => $name,
-        version       => $version,
-        dist_filename => $dist_filename,
-    };
-}
-
-sub _unparse_line {
-    my ($self, $package) = @_;
-    return sprintf
-        "%-34s %5s  %s\n",
-        $package->{package},
-        $package->{version} // 'undef',
-        $package->{dist_filename}
-    ;
-}
-
 
 1;
 

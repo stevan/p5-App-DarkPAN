@@ -34,11 +34,102 @@ sub file { $_[0]->{file} }
 
 ## ...
 
-sub fetch_all;
-sub fetch;
-sub find;
-sub upsert;
-sub delete;
+sub unpack_line_into_data;
+sub   pack_data_into_line;
+
+sub fetch_all {
+    my ($self) = @_;
+    
+    my $fh = $self->open_file_for_reading( $self->{file} );
+    
+    my @data;
+    while ( my $line = $fh->getline ) {
+        push @data => $self->unpack_line_into_data( $line );
+    }
+    
+    $fh->close;
+    
+    return @data;    
+}
+
+sub fetch {
+    my ($self, $pattern) = @_;
+    
+    my $fh = $self->open_file_for_reading( $self->{file} );
+    
+    my $datum;
+    while ( my $line = $fh->getline ) {
+        if ( $line =~ m/$pattern/) {    
+            $datum = $self->unpack_line_into_data( $line );
+            last;
+        }
+    }
+    
+    $fh->close;
+    
+    return $datum;
+}
+
+sub find {
+    my ($self, $pattern) = @_;
+    
+    my $fh = $self->open_file_for_reading( $self->{file} );
+    
+    my @data;
+    while ( my $line = $fh->getline ) {
+        if ( $line =~ m/$pattern/) {    
+            push @data => $self->unpack_line_into_data( $line );
+        }
+    }
+    
+    $fh->close;
+    
+    return @data;
+}
+
+sub upsert {
+    my ($self, $pattern, $data) = @_;
+    
+    my $found = 0;
+    $self->write_changes_to_file(
+        per_line => sub {
+            my ($input) = @_;
+            if ( $input =~ m/$pattern/ ) {
+                # just replace it with the new item
+                # info if we match it 
+                $found++;          
+                return $self->pack_data_into_line( $data );    
+            }
+            # otherwise just pass through ...
+            return $input;
+        },
+        post => sub {
+            my ($in, $out) = @_;
+            # if we didn't find it already, it is 
+            # new so we need to add it to the end.
+            $out->print( $self->pack_data_into_line( $data ) )
+                unless $found;
+        }
+    );
+    
+    return;
+}
+
+sub delete {
+    my ($self, $pattern) = @_;
+    
+    $self->write_changes_to_file(
+        per_line => sub {
+            my ($input) = @_;
+            # return nothing, so we skip the line ...
+            return if $input =~ m/$pattern/;
+            # otherwise just pass through ....
+            return $input;
+        },
+    );
+    
+    return;
+}
 
 ## ...
 
