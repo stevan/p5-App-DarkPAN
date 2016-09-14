@@ -21,6 +21,7 @@ BEGIN {
 
         use_ok('App::DarkPAN::Command::select');
         use_ok('App::DarkPAN::Command::upsert');
+        use_ok('App::DarkPAN::Command::delete');
 
         use_ok('App::DarkPAN::Command::tutorial');
 }
