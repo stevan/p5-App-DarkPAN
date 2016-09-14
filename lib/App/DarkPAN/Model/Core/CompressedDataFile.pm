@@ -66,7 +66,10 @@ sub upsert {
                 # just replace it with the new item
                 # info if we match it 
                 $found++;          
-                return $self->pack_data_into_line( $data );    
+                return $self->pack_data_into_line({ 
+                    %{ $self->unpack_line_into_data( $input ) },
+                    %{ $data }
+                });    
             }
             # otherwise just pass through ...
             return $input;
