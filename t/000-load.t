@@ -16,12 +16,12 @@ BEGIN {
 
         use_ok('App::DarkPAN::Command::init');
 
-        use_ok('App::DarkPAN::Command::inject');
-        use_ok('App::DarkPAN::Command::submit');
+        use_ok('App::DarkPAN::Command::repo_inject');
+        use_ok('App::DarkPAN::Command::repo_submit');
 
-        use_ok('App::DarkPAN::Command::select');
-        use_ok('App::DarkPAN::Command::upsert');
-        use_ok('App::DarkPAN::Command::delete');
+        use_ok('App::DarkPAN::Command::data_select');
+        use_ok('App::DarkPAN::Command::data_upsert');
+        use_ok('App::DarkPAN::Command::data_delete');
 
         use_ok('App::DarkPAN::Command::tutorial');
 }
