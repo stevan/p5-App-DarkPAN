@@ -32,10 +32,12 @@ sub new {
 
 sub file { $_[0]->{file} }
 
-## ...
+## ... abstract methods
 
 sub unpack_line_into_data;
 sub   pack_data_into_line;
+
+## ...
 
 sub select {
     my ($self, $pattern) = @_;
