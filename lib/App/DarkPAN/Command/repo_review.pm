@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::repo_inject;
+package App::DarkPAN::Command::repo_review;
 
 use strict;
 use warnings;
@@ -11,13 +11,11 @@ use CPAN::Mini::Inject ();
 
 use App::DarkPAN -command;
 
-sub command_names { 'repo/inject' }
+sub command_names { 'repo/review' }
 
 sub opt_spec {
     my ($class) = @_;
     return (
-        [ 'dry-run', 'List the staged modules, but do not inject them' ],
-        [],
         $class->SUPER::opt_spec,
     )
 }
@@ -45,13 +43,6 @@ sub execute {
     }
     else {
         print "No modules.\n"
-    }
-
-    my $prefix = $opt->dry_run ? '[dry-run] ' : '';
-    print "${prefix}Injecting $num_modules modules into DarkPAN.\n";
-    unless ( $opt->dry_run ) {
-        $mcpi->inject;
-        print "$num_modules module(s) injected into the DarkPAN.\n";
     }
 }
 

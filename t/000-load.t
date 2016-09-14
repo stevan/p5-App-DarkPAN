@@ -17,6 +17,7 @@ BEGIN {
         use_ok('App::DarkPAN::Command::init');
 
         use_ok('App::DarkPAN::Command::repo_inject');
+        use_ok('App::DarkPAN::Command::repo_review');
         use_ok('App::DarkPAN::Command::repo_submit');
 
         use_ok('App::DarkPAN::Command::data_select');
