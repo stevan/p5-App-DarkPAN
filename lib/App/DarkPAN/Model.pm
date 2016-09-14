@@ -31,6 +31,8 @@ sub new {
     } => $class;
 }
 
+sub JSON { $JSON }
+
 sub authors {
     my ($self) = @_;
     return App::DarkPAN::Model::Authors->new(
