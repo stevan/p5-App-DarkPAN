@@ -70,7 +70,7 @@ sub execute {
         }
     }
     else {
-        print "Unable to find author for ($matches)\n" if $opt->verbose;
+        print "Unable to find author for ($matches)\n" if $opt->verbose && $matches;
     }
 }
 
