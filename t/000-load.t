@@ -11,6 +11,9 @@ BEGIN {
     use_ok('App::DarkPAN::Model');
 
         use_ok('App::DarkPAN::Model::Authors');
+        use_ok('App::DarkPAN::Model::Packages');
+        
+            use_ok('App::DarkPAN::Model::Core::CompressedDataFile');
 
     use_ok('App::DarkPAN::Command');
 
