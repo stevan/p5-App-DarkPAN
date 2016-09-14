@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::delete;
+package App::DarkPAN::Command::data_upsert;
 
 use strict;
 use warnings;
@@ -14,22 +14,25 @@ use App::DarkPAN -command;
 
 =pod
 
-darkpan delete
-    --from     authors    # look in authers
+darkpan data/upsert 
+    --into     authors    # look in authers
     --where    pauseid    # match against the pauseid field
     --matches  STEV[EA]N  # use this as a regexp to match against
+    --data     '{"pauseid":"STEVAN", ...}'
 
 =cut
 
-sub command_names { 'data/delete' }
+sub command_names { 'data/upsert' }
 
 sub opt_spec {
     my ($class) = @_;
     return (
-        [ 'from=s',    'the model to delete the data from' => { required => 1 } ],
+        [ 'into=s',    'the model to update the data in' => { required => 1 } ],
         [],
-        [ 'where=s',   'the key to match on'               => { required => 1 } ],
-        [ 'matches=s', 'the regexp to match with'          => { required => 1 } ],
+        [ 'where=s',   'the key to match on'             => { required => 1 } ],
+        [ 'matches=s', 'the regexp to match with'        => { required => 1 } ],
+        [],
+        [ 'data=s',    'a JSON string of the new data'   => { required => 1 } ],
         [],
         $class->SUPER::opt_spec,
     )
@@ -44,18 +47,22 @@ sub execute {
         unless -d $root->child('CPAN')
             && -d $root->child('DBOX');
 
-    my $from    = $opt->from;
+    my $into    = $opt->into;
     my $where   = $opt->where;
     my $matches = $opt->matches;
+    my $json    = $opt->data;
 
     my $model = App::DarkPAN::Model->new( root => $root );
     
-    die 'Cannot find model type:' . $from
-        unless $model->can($from);
+    die 'Cannot find model type:' . $into
+        unless $model->can($into);
 
-    my $m = $model->$from();
+    my $JSON = $model->JSON;
+    my $data = $JSON->decode( $json );
+
+    my $m = $model->$into();
     
-    $m->delete( $where, $matches );
+    $m->upsert( $data, $where, $matches );
 }
 
 1;

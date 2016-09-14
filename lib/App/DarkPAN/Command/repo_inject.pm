@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::inject;
+package App::DarkPAN::Command::repo_inject;
 
 use strict;
 use warnings;

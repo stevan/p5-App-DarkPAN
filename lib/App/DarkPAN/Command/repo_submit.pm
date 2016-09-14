@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::submit;
+package App::DarkPAN::Command::repo_submit;
 
 use strict;
 use warnings;

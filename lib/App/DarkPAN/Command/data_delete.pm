@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::select;
+package App::DarkPAN::Command::data_delete;
 
 use strict;
 use warnings;
@@ -14,25 +14,22 @@ use App::DarkPAN -command;
 
 =pod
 
-darkpan select 
+darkpan data/delete
     --from     authors    # look in authers
     --where    pauseid    # match against the pauseid field
     --matches  STEV[EA]N  # use this as a regexp to match against
-    --extracts name       # extract this field from the results
 
 =cut
 
-sub command_names { 'data/select' }
+sub command_names { 'data/delete' }
 
 sub opt_spec {
     my ($class) = @_;
     return (
-        [ 'from=s',    'the model to select from' => { required => 1 } ],
+        [ 'from=s',    'the model to delete the data from' => { required => 1 } ],
         [],
-        [ 'where=s',   'the key to match on'      ],
-        [ 'matches=s', 'the regexp to match with' ],
-        [],
-        [ 'extract=s', 'the key to extract (optional)' ],
+        [ 'where=s',   'the key to match on'               => { required => 1 } ],
+        [ 'matches=s', 'the regexp to match with'          => { required => 1 } ],
         [],
         $class->SUPER::opt_spec,
     )
@@ -57,28 +54,15 @@ sub execute {
         unless $model->can($from);
 
     my $m = $model->$from();
-    if ( my @data = $m->select( $where, $matches ) ) {
-        
-        printf "Got %d results\n", scalar @data if $opt->verbose;
-        warn Data::Dumper::Dumper( \@data )     if $opt->debug;
-        
-        if ( my $key = $opt->extract ) {
-            print $_->{ $key }, "\n" foreach @data;   
-        }
-        else {
-            print $m->pack_data_into_line( $_ ) foreach @data;    
-        }
-    }
-    else {
-        print "Unable to find author for ($matches)\n" if $opt->verbose;
-    }
+    
+    $m->delete( $where, $matches );
 }
 
 1;
 
 __END__
 
-# ABSTRACT: Perform operations to select data from models
+# ABSTRACT: Perform operations to update data from models
 
 =pod
 
