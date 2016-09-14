@@ -10,30 +10,32 @@ use parent 'App::DarkPAN::Model::Core::CompressedDataFile';
 
 ## ... overridden methods 
 
-sub fetch_all {
-    my ($self) = @_;
-    return sort { $a->{package} cmp $b->{package} } $self->SUPER::fetch_all;    
-}
-
-sub fetch {
-    my ($self, $name) = @_;
-    return $self->SUPER::fetch( qr/^$name\s/ )
-}
-
-sub find {
-    my ($self, $name_pattern) = @_;
-    return $self->SUPER::fetch( qr/^$name_pattern/ );
+sub select {
+    my ($self, $key, $pattern) = @_;
+    return $self->SUPER::select( 
+        ($key && $pattern)
+            ? $self->_regexp_match_builder( $key, $pattern ) 
+            : ()
+    );
 }
 
 sub upsert {
-    my ($self, $package) = @_;
-    my $package_name = $package->{package};
-    return $self->SUPER::upsert( qr/^$package_name\s/, $package );
+    my ($self, $new_author, $key, $pattern) = @_;
+    die 'You must specify a key/pattern pair when updating'
+        unless ($key && $pattern);
+    return $self->SUPER::upsert( 
+        $self->_regexp_match_builder( $key, $pattern ), 
+        $new_author
+    );
 }
 
 sub delete {
-    my ($self, $package_name) = @_;
-    return $self->SUPER::delete( qr/^$package_name\s/ );
+    my ($self, $key, $pattern) = @_;
+    die 'You must specify a key/pattern pair when deleting'
+        unless ($key && $pattern);
+    return $self->SUPER::delete(
+        $self->_regexp_match_builder( $key, $pattern ), 
+    );
 }
 
 sub open_file_for_reading {
@@ -75,7 +77,15 @@ sub pack_data_into_line {
     ;
 }
 
-## ... private methods 
+## ... private methods
+
+sub _regexp_match_builder {
+    my ($self, $key, $pattern) = @_;
+    return qr/^$pattern/              if $key eq 'package';
+    return qr/^(.*)\s$pattern/        if $key eq 'version';
+    return qr/^(.*)\s(.*)\s$pattern$/ if $key eq 'dist_filename';
+    die 'Unknown key: ' . $key;
+}
 
 sub _skip_package_file_header {
     my ($self, $fh) = @_;

@@ -40,9 +40,9 @@ subtest '... reading empty packages model, adding to it and saving' => sub {
     my $packages = $m->packages;
     isa_ok($packages, 'App::DarkPAN::Model::Packages');
 
-    $packages->upsert($Moose);
+    $packages->upsert($Moose, package => 'Moose');
 
-    my $data = $packages->fetch('Moose');
+    my ($data) = $packages->select(package => 'Moose');
     is_deeply($data, $Moose, '... got the same data back out');
     isnt($data, $Moose, '... but different instances');
 };
@@ -55,11 +55,11 @@ subtest '... reading packages model confirming the above worked' => sub {
     my $packages = $m->packages;
     isa_ok($packages, 'App::DarkPAN::Model::Packages');
 
-    my $data = $packages->fetch('Moose');
+    my ($data) = $packages->select(package => 'Moose');
     is_deeply($data, $Moose, '... got the same data back out');
     isnt($data, $Moose, '... but different instances');
 
-    my @all = $packages->fetch_all;
+    my @all = $packages->select;
     is(scalar(@all), 1, '... there is only one author in the list');
     is_deeply($all[0], $Moose, '... got the data back out with package added');
 };

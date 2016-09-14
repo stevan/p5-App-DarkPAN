@@ -36,9 +36,9 @@ subtest '... reading empty authors model, adding to it and saving' => sub {
     my $authors = $m->authors;
     isa_ok($authors, 'App::DarkPAN::Model::Authors');
 
-    $authors->upsert($STEVAN);
+    $authors->upsert($STEVAN, pauseid => 'STEVAN');
 
-    my $data = $authors->fetch('STEVAN');
+    my ($data) = $authors->select(pauseid => 'STEVAN');
     is_deeply($data, $STEVAN, '... got the same data back out');
     isnt($data, $STEVAN, '... but different instances');
 };
@@ -51,11 +51,11 @@ subtest '... reading authors model confirming the above worked' => sub {
     my $authors = $m->authors;
     isa_ok($authors, 'App::DarkPAN::Model::Authors');
 
-    my $data = $authors->fetch('STEVAN');
+    my ($data) = $authors->select(pauseid => 'STEVAN');
     is_deeply($data, $STEVAN, '... got the same data back out');
     isnt($data, $STEVAN, '... but different instances');
 
-    my @all = $authors->fetch_all;
+    my @all = $authors->select;
     is(scalar(@all), 1, '... there is only one author in the list');
     is_deeply($all[0], $STEVAN, '... got the data back out');
 };

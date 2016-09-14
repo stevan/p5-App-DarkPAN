@@ -37,49 +37,17 @@ sub file { $_[0]->{file} }
 sub unpack_line_into_data;
 sub   pack_data_into_line;
 
-sub fetch_all {
-    my ($self) = @_;
+sub select {
+    my ($self, $pattern) = @_;
     
     my $fh = $self->open_file_for_reading( $self->{file} );
     
     my @data;
     while ( my $line = $fh->getline ) {
+        next unless $line;
+        next if $pattern && $line !~ m/$pattern/;
+    
         push @data => $self->unpack_line_into_data( $line );
-    }
-    
-    $fh->close;
-    
-    return @data;    
-}
-
-sub fetch {
-    my ($self, $pattern) = @_;
-    
-    my $fh = $self->open_file_for_reading( $self->{file} );
-    
-    my $datum;
-    while ( my $line = $fh->getline ) {
-        if ( $line =~ m/$pattern/) {    
-            $datum = $self->unpack_line_into_data( $line );
-            last;
-        }
-    }
-    
-    $fh->close;
-    
-    return $datum;
-}
-
-sub find {
-    my ($self, $pattern) = @_;
-    
-    my $fh = $self->open_file_for_reading( $self->{file} );
-    
-    my @data;
-    while ( my $line = $fh->getline ) {
-        if ( $line =~ m/$pattern/) {    
-            push @data => $self->unpack_line_into_data( $line );
-        }
     }
     
     $fh->close;

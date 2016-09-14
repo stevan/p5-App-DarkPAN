@@ -10,30 +10,32 @@ use parent 'App::DarkPAN::Model::Core::CompressedDataFile';
 
 ## ... overridden methods 
 
-sub fetch_all {
-    my ($self) = @_;
-    return sort { $a->{pauseid} cmp $b->{pauseid} } $self->SUPER::fetch_all;    
-}
-
-sub fetch {
-    my ($self, $pauseid) = @_;
-    return $self->SUPER::fetch( qr/^alias $pauseid\s/ )
-}
-
-sub find {
-    my ($self, $pauseid_pattern) = @_;
-    return $self->SUPER::fetch( qr/^alias $pauseid_pattern/ );
+sub select {
+    my ($self, $key, $pattern) = @_;
+    return $self->SUPER::select( 
+        ($key && $pattern)
+            ? $self->_regexp_match_builder( $key, $pattern ) 
+            : ()
+    );
 }
 
 sub upsert {
-    my ($self, $author) = @_;
-    my $pauseid = $author->{pauseid};
-    return $self->SUPER::upsert( qr/^alias $pauseid\s/, $author );
+    my ($self, $new_author, $key, $pattern) = @_;
+    die 'You must specify a key/pattern pair when updating'
+        unless ($key && $pattern);
+    return $self->SUPER::upsert( 
+        $self->_regexp_match_builder( $key, $pattern ), 
+        $new_author
+    );
 }
 
 sub delete {
-    my ($self, $pauseid) = @_;
-    return $self->SUPER::delete( qr/^alias $pauseid\s/ );
+    my ($self, $key, $pattern) = @_;
+    die 'You must specify a key/pattern pair when deleting'
+        unless ($key && $pattern);
+    return $self->SUPER::delete(
+        $self->_regexp_match_builder( $key, $pattern ), 
+    );
 }
 
 ## ... abstract methods
@@ -58,6 +60,16 @@ sub pack_data_into_line {
         $author->{name}  // '',
         $author->{email} // '',
     );
+}
+
+## ... private methods
+
+sub _regexp_match_builder {
+    my ($self, $key, $pattern) = @_;
+    return qr/^alias $pattern/      if $key eq 'pauseid';
+    return qr/\"$pattern \<.+\>\"$/ if $key eq 'name';
+    return qr/\<$pattern\>\"$/      if $key eq 'email';
+    die 'Unknown key: ' . $key;
 }
 
 1;
