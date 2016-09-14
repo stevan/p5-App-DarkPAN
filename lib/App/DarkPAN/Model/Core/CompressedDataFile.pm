@@ -13,7 +13,10 @@ use IO::Zlib     ();
 sub new {
     my ($class, %args) = @_;
     
-    die "Cannot create Author model without a file specified" 
+    die $class.' is an abstract class and cannot be instantiated'
+        if $class eq __PACKAGE__;
+    
+    die 'Cannot create Author model without a file specified'
         if not defined $args{file};
     
     $args{file} = Path::Tiny::path( $args{file} )
