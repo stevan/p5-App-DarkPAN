@@ -12,12 +12,20 @@ use App::DarkPAN::Model;
 
 use App::DarkPAN -command;
 
-# darkpan select --from authors --where name --matches 'John*'
+=pod
+
+darkpan select 
+    --from     authors    # look in authers
+    --where    pauseid    # match against the pauseid field
+    --matches  STEV[EA]N  # use this as a regexp to match against
+    --extracts name       # extract this field from the results
+
+=cut
 
 sub opt_spec {
     my ($class) = @_;
     return (
-        [ 'from=s',    'the model to select from' ],
+        [ 'from=s',    'the model to select from' => { required => 1 } ],
         [],
         [ 'where=s',   'the key to match on'      ],
         [ 'matches=s', 'the regexp to match with' ],
