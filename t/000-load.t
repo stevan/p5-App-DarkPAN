@@ -19,8 +19,8 @@ BEGIN {
         use_ok('App::DarkPAN::Command::inject');
         use_ok('App::DarkPAN::Command::submit');
 
-        use_ok('App::DarkPAN::Command::authors');
-        use_ok('App::DarkPAN::Command::packages');
+        use_ok('App::DarkPAN::Command::select');
+        use_ok('App::DarkPAN::Command::upsert');
 
         use_ok('App::DarkPAN::Command::tutorial');
 }
