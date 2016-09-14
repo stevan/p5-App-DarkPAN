@@ -14,6 +14,8 @@ use CPAN::Mini::Inject ();
 
 use App::DarkPAN -command;
 
+sub command_names { 'repo/submit' }
+
 sub opt_spec {
     my ($class) = @_;
     return (

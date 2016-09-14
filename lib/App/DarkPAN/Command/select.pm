@@ -22,6 +22,8 @@ darkpan select
 
 =cut
 
+sub command_names { 'data/select' }
+
 sub opt_spec {
     my ($class) = @_;
     return (

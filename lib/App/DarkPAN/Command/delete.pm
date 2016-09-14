@@ -21,6 +21,8 @@ darkpan delete
 
 =cut
 
+sub command_names { 'data/delete' }
+
 sub opt_spec {
     my ($class) = @_;
     return (

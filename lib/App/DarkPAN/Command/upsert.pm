@@ -22,6 +22,8 @@ darkpan upsert
 
 =cut
 
+sub command_names { 'data/upsert' }
+
 sub opt_spec {
     my ($class) = @_;
     return (

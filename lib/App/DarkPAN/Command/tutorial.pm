@@ -22,39 +22,36 @@ __END__
 
 =head1 DESCRIPTION
 
+
   > cd ~/DarkPAN/ # optionally we can add `--root ~/DarkPAN/` to all commands
 
   > darkpan init
   DarkPAN created in (~/DarkPAN/dpan)
 
-  > darkpan list --authors --packages
-  No authors.
-  No packages.
+  > darkpan data/select --from authors; darkpan data/select --from packages
+  # nothing
 
-  > darkpan submit --author DGOLDEN --file ~/Downloads/Path-Tiny-0.096.tar.gz
+  > darkpan repo/submit --author DGOLDEN --file ~/Downloads/Path-Tiny-0.096.tar.gz
 
-  > darkpan list --authors --packages
-  No authors.
-  No packages.
+  > darkpan data/select --from authors; darkpan data/select --from packages
+  # still nothing
 
-  > darkpan inject --review
+  > darkpan repo/inject --review
   Found 2 modules.
   Path::Tiny 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
   Path::Tiny::Error 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
 
-  > darkpan inject
+  > darkpan repo/inject
   Found 2 modules.
   Path::Tiny 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
   Path::Tiny::Error 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
   Injected 2 modules into DarkPAN.
 
 
-  > darkpan list --authors --packages
-  Found 1 authors.
-  DGOLDEN CENSORED Custom Non-CPAN author
-  Found 2 packages.
-  Path::Tiny 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
-  Path::Tiny::Error 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
+  > darkpan data/select --from authors; darkpan data/select --from packages
+  alias DGOLDEN "Custom Non-CPAN author <CENSORED>"
+  Path::Tiny                         0.096  D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
+  Path::Tiny::Error                  0.096  D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
 
   > cpanm --mirror ~/DarkPAN/CPAN/ --mirror-only Path::Tiny --force
   --> Working on Path::Tiny
