@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::data_upsert;
+package App::DarkPAN::Command::data::upsert;
 
 use strict;
 use warnings;

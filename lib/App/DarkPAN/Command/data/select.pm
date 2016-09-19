@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::data_select;
+package App::DarkPAN::Command::data::select;
 
 use strict;
 use warnings;

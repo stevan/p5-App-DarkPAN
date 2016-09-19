@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::data_delete;
+package App::DarkPAN::Command::data::delete;
 
 use strict;
 use warnings;
