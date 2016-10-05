@@ -19,13 +19,13 @@ BEGIN {
 
         use_ok('App::DarkPAN::Command::init');
 
-        use_ok('App::DarkPAN::Command::repo_inject');
-        use_ok('App::DarkPAN::Command::repo_review');
-        use_ok('App::DarkPAN::Command::repo_submit');
+        use_ok('App::DarkPAN::Command::repo::inject');
+        use_ok('App::DarkPAN::Command::repo::review');
+        use_ok('App::DarkPAN::Command::repo::submit');
 
-        use_ok('App::DarkPAN::Command::data_select');
-        use_ok('App::DarkPAN::Command::data_upsert');
-        use_ok('App::DarkPAN::Command::data_delete');
+        use_ok('App::DarkPAN::Command::data::select');
+        use_ok('App::DarkPAN::Command::data::upsert');
+        use_ok('App::DarkPAN::Command::data::delete');
 
         use_ok('App::DarkPAN::Command::tutorial');
 }
