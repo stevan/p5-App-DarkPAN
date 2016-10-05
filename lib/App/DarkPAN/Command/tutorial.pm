@@ -22,7 +22,6 @@ __END__
 
 =head1 DESCRIPTION
 
-
   > cd ~/DarkPAN/ # optionally we can add `--root ~/DarkPAN/` to all commands
 
   > darkpan init
@@ -36,7 +35,7 @@ __END__
   > darkpan data/select --from authors; darkpan data/select --from packages
   # still nothing
 
-  > darkpan repo/inject --review
+  > darkpan repo/review
   Found 2 modules.
   Path::Tiny 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
   Path::Tiny::Error 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
@@ -46,7 +45,6 @@ __END__
   Path::Tiny 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
   Path::Tiny::Error 0.096 D/DG/DGOLDEN/Path-Tiny-0.096.tar.gz
   Injected 2 modules into DarkPAN.
-
 
   > darkpan data/select --from authors; darkpan data/select --from packages
   alias DGOLDEN "Custom Non-CPAN author <CENSORED>"
