@@ -27,6 +27,12 @@ sub command_names { 'data/select' }
 sub opt_spec {
     my ($class) = @_;
     return (
+        
+        # TODO:
+        # add an option to generate as CSV
+        # or some other thing like that
+        # - SL 
+        
         [ 'from=s',    'the model to select from' => { required => 1 } ],
         [],
         [ 'where=s',   'the key to match on'      ],
