@@ -36,9 +36,8 @@ sub execute {
              ->slurp 
     );
 
-    my $num_modules;
     if ( @$modlist ) {
-        $num_modules = scalar @$modlist;
+        my $num_modules = scalar @$modlist;
         print "Found $num_modules module(s).\n";
         print $self->generate_data_table( $modlist ), "\n";
     }
