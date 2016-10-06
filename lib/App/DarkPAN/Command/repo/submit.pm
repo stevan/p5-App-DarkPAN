@@ -60,10 +60,10 @@ sub execute {
     my $modlist  = -s $modlist_file ? $JSON->decode( $modlist_file->slurp ) : [];
     
     push @$modlist => {
-        module   => $meta->{name} =~ s/-/::/gr,
-        version  => $meta->{version},
-        authorid => $opt->author,
-        file     => $out_file->relative( $dbox )->stringify,
+        name    => $meta->{name},
+        version => $meta->{version},
+        author  => $opt->author,
+        file    => $out_file->relative( $dbox )->stringify,
     };
     
     $modlist_file->spew( $JSON->encode( $modlist ) );
