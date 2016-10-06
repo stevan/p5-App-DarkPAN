@@ -81,7 +81,7 @@ sub pack_data_into_line {
 
 sub _regexp_match_builder {
     my ($self, $key, $pattern) = @_;
-    return qr/^$pattern/              if $key eq 'package';
+    return qr/^$pattern\s/            if $key eq 'package';
     return qr/^(.*)\s$pattern/        if $key eq 'version';
     return qr/^(.*)\s(.*)\s$pattern$/ if $key eq 'dist_filename';
     die 'Unknown key: ' . $key;

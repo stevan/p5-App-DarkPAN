@@ -66,7 +66,7 @@ sub pack_data_into_line {
 
 sub _regexp_match_builder {
     my ($self, $key, $pattern) = @_;
-    return qr/^alias $pattern/      if $key eq 'pauseid';
+    return qr/^alias $pattern\s/    if $key eq 'pauseid';
     return qr/\"$pattern \<.+\>\"$/ if $key eq 'name';
     return qr/\<$pattern\>\"$/      if $key eq 'email';
     die 'Unknown key: ' . $key;
