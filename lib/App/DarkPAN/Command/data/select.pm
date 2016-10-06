@@ -63,10 +63,10 @@ sub execute {
         warn Data::Dumper::Dumper( \@data )     if $opt->debug;
         
         if ( my $key = $opt->extract ) {
-            print $_->{ $key }, "\n" foreach @data;   
+            print $self->generate_data_table( \@data, [ $key ] ), "\n";
         }
         else {
-            print $m->pack_data_into_line( $_ ) foreach @data;    
+            print $self->generate_data_table( \@data ), "\n";
         }
     }
     else {
