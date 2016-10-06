@@ -6,8 +6,9 @@ use warnings;
 our $VERSION   = '0.01';
 our $AUTHORITY = 'cpan:STEVAN';
 
-use Path::Tiny         ();
-use CPAN::Mini::Inject ();
+use Path::Tiny ();
+
+use App::DarkPAN::Model;
 
 use App::DarkPAN -command;
 
@@ -29,17 +30,17 @@ sub execute {
         unless -d $root->child('CPAN')
             && -d $root->child('DBOX');
 
-    my $mcpi = CPAN::Mini::Inject->new;
-    $mcpi->parsecfg( $root->child('mcpani.config') );
-    $mcpi->readlist;
+    my $modlist = App::DarkPAN::Model->JSON->decode( 
+        $root->child('DBOX')
+             ->child('modlist.json')
+             ->slurp 
+    );
 
     my $num_modules;
-    if ( my @modules = @{ $mcpi->{modulelist} } ) {
-        $num_modules = scalar @modules;
-        print "Found $num_modules modules.\n";
-        foreach my $mod ( @modules ) {
-            print $mod =~ s/\s+/ /gr, "\n";
-        }
+    if ( @$modlist ) {
+        $num_modules = scalar @$modlist;
+        print "Found $num_modules module(s).\n";
+        print $self->generate_data_table( $modlist ), "\n";
     }
     else {
         print "No modules.\n"

@@ -10,7 +10,8 @@ use Path::Tiny         ();
 use YAML               ();
 use List::Util         qw[ first ];
 use Archive::Tar       ();
-use CPAN::Mini::Inject ();
+
+use App::DarkPAN::Model;
 
 use App::DarkPAN -command;
 
@@ -19,8 +20,8 @@ sub command_names { 'repo/submit' }
 sub opt_spec {
     my ($class) = @_;
     return (
-        [ 'file=s',   'file to submit to DarkPAN' ],
-        [ 'author=s', 'PAUSE author name' ],
+        [ 'file=s',   'file to submit to DarkPAN', { required => 1 } ],
+        [ 'author=s', 'PAUSE author name',         { required => 1 } ],
         [],
         $class->SUPER::opt_spec,
     )
@@ -35,23 +36,37 @@ sub execute {
         unless -d $root->child('CPAN')
             && -d $root->child('DBOX');
 
-    my $file = Path::Tiny::path( $opt->file );
-    die 'Unable to find file ('.$opt->file.')' unless -e $file;
+    my $in_file = Path::Tiny::path( $opt->file );
+    die 'Unable to find file ('.$opt->file.')' unless -e $in_file;
 
-    my $meta = $self->load_metayaml( $file->stringify );
+    my $meta = $self->load_metayaml( $in_file->stringify );
     die 'Unable to find meta file inside ('.$opt->file.')' unless $meta;
-
-    my $module = $meta->{name} =~ s/-/::/gr; # /
-    my $mcpi   = CPAN::Mini::Inject->new;
-    $mcpi->parsecfg( $root->child('mcpani.config')->stringify );
-    $mcpi->readlist;
-    $mcpi->add(
-        file     => $file->stringify,
-        module   => $module,
+    
+    my $author       = $opt->author;    
+    my $dbox         = $root->child('DBOX');    
+    my $modlist_file = $dbox->child('modlist.json');
+    my $authors_dir  = $dbox->child('authors')
+                            ->child('id')
+                            ->child( substr $author, 0, 1 )
+                            ->child( substr $author, 0, 2 )
+                            ->child( $author );
+    
+    $authors_dir->mkpath unless -d $authors_dir;
+    $modlist_file->touch unless -e $modlist_file;
+    
+    my $out_file = $in_file->copy( $authors_dir );
+    
+    my $JSON     = App::DarkPAN::Model->JSON;
+    my $modlist  = -s $modlist_file ? $JSON->decode( $modlist_file->slurp ) : [];
+    
+    push @$modlist => {
+        module   => $meta->{name} =~ s/-/::/gr,
         version  => $meta->{version},
         authorid => $opt->author,
-    );
-    $mcpi->writelist;
+        file     => $out_file->relative( $dbox )->stringify,
+    };
+    
+    $modlist_file->spew( $JSON->encode( $modlist ) );
 }
 
 sub load_metayaml {
