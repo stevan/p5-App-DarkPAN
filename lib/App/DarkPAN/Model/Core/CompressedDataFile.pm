@@ -65,8 +65,11 @@ sub upsert {
     
     my $found = 0;
     $self->write_changes_to_file(
-        per_line => sub {
-            my ($input) = @_;
+        operation => 'upsert',
+        pattern   => $pattern,
+        per_line  => sub {
+            my ($input, $idx) = @_;
+            
             if ( $input =~ m/$pattern/ ) {
                 # just replace it with the new item
                 # info if we match it 
@@ -80,7 +83,7 @@ sub upsert {
             return $input;
         },
         post => sub {
-            my ($in, $out) = @_;
+            my ($in, $out, $lines, $args) = @_;
             # if we didn't find it already, it is 
             # new so we need to add it to the end.
             $out->print( $self->pack_data_into_line( $data ) )
@@ -95,8 +98,10 @@ sub delete {
     my ($self, $pattern) = @_;
     
     $self->write_changes_to_file(
-        per_line => sub {
-            my ($input) = @_;
+        operation => 'delete',
+        pattern   => $pattern,
+        per_line  => sub {
+            my ($input, $idx) = @_;
             # return nothing, so we skip the line ...
             return if $input =~ m/$pattern/;
             # otherwise just pass through ....
@@ -126,22 +131,35 @@ sub open_file_for_writing {
 sub write_changes_to_file {
     my ($self, %args) = @_;
 
-    my $per_line = $args{per_line} || die 'You must at least supply a per_line handler'; 
+    # these two things are not used here
+    # but get passed along to the callbacks
+    $args{pattern}   || die 'You must supply the pattern being used';
+    $args{operation} || die 'You must supply a operation type'; 
+
+    my $per_line = $args{per_line} || die 'You must at least supply a per_line handler';
     my $pre      = $args{pre};
     my $post     = $args{post};
 
-    my $temp = Path::Tiny->tempfile;
-    my $in   = $self->open_file_for_reading( $self->{file} );
-    my $out  = $self->open_file_for_writing( $temp );
+    my $temp  = Path::Tiny->tempfile;
+    my $in    = $self->open_file_for_reading( $self->{file} );
+    my $out   = $self->open_file_for_writing( $temp );
+    my @lines = $in->getlines;
 
-    $pre->( $in, $out ) if $pre;
+    $pre->( $in, $out, \@lines, \%args ) if $pre;
+    
+    #use Data::Dumper;
+    #warn Dumper \@lines;
+    #warn Dumper [ 0 .. $#lines ];
+    #warn Dumper [ @lines[ 0 .. $#lines ] ];
 
-    while ( my $input = $in->getline ) {    
-        my $output = $per_line->( $input );
-        $out->print( $output ) if $output;
+    if ( @lines ) {
+        foreach my $i ( 0 .. $#lines ) {    
+            my $output = $per_line->( $lines[ $i ], $i );
+            $out->print( $output ) if $output;
+        }
     }
 
-    $post->( $in, $out ) if $post;
+    $post->( $in, $out, \@lines, \%args ) if $post;
 
     $out->close;
     $in->close;

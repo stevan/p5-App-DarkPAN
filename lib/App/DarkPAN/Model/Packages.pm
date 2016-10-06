@@ -38,18 +38,50 @@ sub delete {
     );
 }
 
+# ...
+
 sub open_file_for_reading {
     my ($self, $file) = @_;
     my $fh = $self->SUPER::open_file_for_reading( $file );
+    # TODO: 
+    # we should actually parse the headers 
+    # and make them visible to the users
+    # of this class.
+    # - SL
     $self->_skip_package_file_header( $fh );
     return $fh;
 }
 
-sub open_file_for_writing {
-    my ($self, $file) = @_;
-    my $fh = $self->SUPER::open_file_for_writing( $file );
-    $self->_write_package_file_header( $fh );
-    return $fh;
+sub write_changes_to_file {
+    my $self = shift;
+    $self->SUPER::write_changes_to_file(
+        pre => sub {
+            my ($in, $out, $lines, $args) = @_;
+            
+            my $num_matches = grep /$args->{pattern}/, @$lines;
+            my $line_count  = scalar @{ $lines };
+            
+            if ( $args->{operation} eq 'delete' ) {
+                if ( $num_matches ) {
+                    # we have a match, so we 
+                    # decrement the line count
+                    # by the number of matches ...
+                    $line_count--;
+                }
+            }
+            elsif ( $args->{operation} eq 'upsert' ) {
+                if ( $num_matches == 0 ) {
+                    # we do not have a match, 
+                    # so we need to increment
+                    # the line count
+                    $line_count++;
+                }
+            }
+            
+            $self->_write_package_file_header( $out, $line_count ); 
+        }, 
+        @_,
+    );
 }
 
 # ... abstract methods
@@ -99,7 +131,7 @@ sub _skip_package_file_header {
 }
 
 sub _write_package_file_header {
-    my ($self, $fh) = @_;
+    my ($self, $fh, $line_count) = @_;
 
     my @header = (
         'File'         => '02packages.details.txt',
@@ -109,12 +141,7 @@ sub _write_package_file_header {
         'Intended-For' => 'Automated fetch routines, namespace documentation.',
         'Written-By'   => (Scalar::Util::blessed($self).' version '.$self->VERSION),
         'Last-Updated' => ((scalar gmtime).' GMT'),
-        # FIXME: 
-        # We want to write this very early
-        # which is a problem, so we need to 
-        # think about how to handle this.
-        # - SL
-        # 'Line-Count'   => $line_count,
+        'Line-Count'   => $line_count,
     );
 
     while (@header) {

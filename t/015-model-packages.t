@@ -17,6 +17,12 @@ my $Moose = {
     dist_filename => 'authors/id/S/ST/STEVAN/Moose-0.01.tar.gz'
 };
 
+my $Moo = {
+    package       => 'Moo',
+    version       => '0.01',
+    dist_filename => 'authors/id/S/ST/STEVAN/Moo-0.01.tar.gz'
+};
+
 my $temp_dir = Path::Tiny->tempdir;
 
 subtest '... creating simple packages model' => sub {
@@ -62,6 +68,40 @@ subtest '... reading packages model confirming the above worked' => sub {
     my @all = $packages->select;
     is(scalar(@all), 1, '... there is only one author in the list');
     is_deeply($all[0], $Moose, '... got the data back out with package added');
+};
+
+subtest '... checking the header'  => sub {
+    
+    my $m = App::DarkPAN::Model->new( root => $temp_dir );
+    isa_ok($m, 'App::DarkPAN::Model');
+
+    my $packages = $m->packages;
+    isa_ok($packages, 'App::DarkPAN::Model::Packages');
+    
+    {
+        my @lines = IO::Zlib->new( $packages->file->stringify, 'r' )->getlines;
+        #warn join '' => @lines;
+    
+        is(scalar( grep /Line\-Count\: 1/, @lines ), 1, '... we matched the line-count as expected');
+    }
+    
+    $packages->upsert($Moo, package => 'Moo');
+    
+    {
+        my @lines = IO::Zlib->new( $packages->file->stringify, 'r' )->getlines;
+        #warn join '' => @lines;
+    
+        is(scalar( grep /Line\-Count\: 2/, @lines ), 1, '... we matched the (new) line-count as expected');
+    }
+    
+    $packages->delete(package => 'Moo');
+    
+    {
+        my @lines = IO::Zlib->new( $packages->file->stringify, 'r' )->getlines;
+        #warn join '' => @lines;
+    
+        is(scalar( grep /Line\-Count\: 1/, @lines ), 1, '... we matched the (even newer) line-count as expected');
+    }
 };
 
 
