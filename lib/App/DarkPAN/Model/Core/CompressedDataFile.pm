@@ -60,12 +60,27 @@ sub select {
     return @data;
 }
 
-sub upsert {
+sub insert {
+    my ($self, $data) = @_;
+    
+    $self->write_changes_to_file(
+        operation => 'insert',
+        post => sub {
+            my ($in, $out, $lines, $args) = @_;
+            # just append this to the end of the document ...
+            $out->print( $self->pack_data_into_line( $data ) );
+        }
+    );
+    
+    return;
+}
+
+sub update {
     my ($self, $pattern, $data) = @_;
     
     my $found = 0;
     $self->write_changes_to_file(
-        operation => 'upsert',
+        operation => 'update',
         pattern   => $pattern,
         per_line  => sub {
             my ($input, $idx) = @_;
@@ -84,9 +99,9 @@ sub upsert {
         },
         post => sub {
             my ($in, $out, $lines, $args) = @_;
-            # if we didn't find it already, it is 
-            # new so we need to add it to the end.
-            $out->print( $self->pack_data_into_line( $data ) )
+            # if we didn't find it already, we 
+            # need to complain loudly 
+            die 'Unable to locate match (' . $pattern . ') for record' 
                 unless $found;
         }
     );
@@ -131,12 +146,12 @@ sub open_file_for_writing {
 sub write_changes_to_file {
     my ($self, %args) = @_;
 
-    # these two things are not used here
-    # but get passed along to the callbacks
-    $args{pattern}   || die 'You must supply the pattern being used';
+    # this is not used here, but it 
+    # must get passed along to the 
+    # callbacks later on
     $args{operation} || die 'You must supply a operation type'; 
 
-    my $per_line = $args{per_line} || die 'You must at least supply a per_line handler';
+    my $per_line = $args{per_line} || sub { $_[0] };
     my $pre      = $args{pre};
     my $post     = $args{post};
 

@@ -19,11 +19,16 @@ sub select {
     );
 }
 
-sub upsert {
+sub insert {
+    my ($self, $new_author) = @_;
+    return $self->SUPER::insert( $new_author );
+}
+
+sub update {
     my ($self, $new_author, $key, $pattern) = @_;
     die 'You must specify a key/pattern pair when updating'
         unless ($key && $pattern);
-    return $self->SUPER::upsert( 
+    return $self->SUPER::update( 
         $self->_regexp_match_builder( $key, $pattern ), 
         $new_author
     );

@@ -19,13 +19,18 @@ sub select {
     );
 }
 
-sub upsert {
-    my ($self, $new_author, $key, $pattern) = @_;
+sub insert {
+    my ($self, $new_package) = @_;
+    return $self->SUPER::insert( $new_package );
+}
+
+sub update {
+    my ($self, $new_package, $key, $pattern) = @_;
     die 'You must specify a key/pattern pair when updating'
         unless ($key && $pattern);
-    return $self->SUPER::upsert( 
+    return $self->SUPER::update( 
         $self->_regexp_match_builder( $key, $pattern ), 
-        $new_author
+        $new_package
     );
 }
 
@@ -58,24 +63,20 @@ sub write_changes_to_file {
         pre => sub {
             my ($in, $out, $lines, $args) = @_;
             
-            my $num_matches = grep /$args->{pattern}/, @$lines;
-            my $line_count  = scalar @{ $lines };
+            my $line_count = scalar @{ $lines };
             
             if ( $args->{operation} eq 'delete' ) {
+                my $num_matches = grep /$args->{pattern}/, @$lines;
                 if ( $num_matches ) {
                     # we have a match, so we 
                     # decrement the line count
                     # by the number of matches ...
-                    $line_count--;
+                    $line_count -= $num_matches;
                 }
             }
-            elsif ( $args->{operation} eq 'upsert' ) {
-                if ( $num_matches == 0 ) {
-                    # we do not have a match, 
-                    # so we need to increment
-                    # the line count
-                    $line_count++;
-                }
+            elsif ( $args->{operation} eq 'insert' ) {
+                # inserts always increment by one ...
+                $line_count++;
             }
             
             $self->_write_package_file_header( $out, $line_count ); 

@@ -46,7 +46,7 @@ subtest '... reading empty packages model, adding to it and saving' => sub {
     my $packages = $m->packages;
     isa_ok($packages, 'App::DarkPAN::Model::Packages');
 
-    $packages->upsert($Moose, package => 'Moose');
+    $packages->insert($Moose);
 
     my ($data) = $packages->select(package => 'Moose');
     is_deeply($data, $Moose, '... got the same data back out');
@@ -85,7 +85,7 @@ subtest '... checking the header'  => sub {
         is(scalar( grep /Line\-Count\: 1/, @lines ), 1, '... we matched the line-count as expected');
     }
     
-    $packages->upsert($Moo, package => 'Moo');
+    $packages->insert($Moo);
     
     {
         my @lines = IO::Zlib->new( $packages->file->stringify, 'r' )->getlines;

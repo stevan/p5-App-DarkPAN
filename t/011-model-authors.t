@@ -36,7 +36,7 @@ subtest '... reading empty authors model, adding to it and saving' => sub {
     my $authors = $m->authors;
     isa_ok($authors, 'App::DarkPAN::Model::Authors');
 
-    $authors->upsert($STEVAN, pauseid => 'STEVAN');
+    $authors->insert($STEVAN);
 
     my ($data) = $authors->select(pauseid => 'STEVAN');
     is_deeply($data, $STEVAN, '... got the same data back out');
