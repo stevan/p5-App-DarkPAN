@@ -67,31 +67,38 @@ sub open_file_for_reading {
 }
 
 sub write_changes_to_file {
-    my $self = shift;
-    $self->SUPER::write_changes_to_file(
-        pre => sub {
-            my ($in, $out, $lines, $args) = @_;
-            
-            my $line_count = scalar @{ $lines };
-            
-            if ( $args->{operation} eq 'delete' ) {
-                my $num_matches = grep /$args->{pattern}/, @$lines;
-                if ( $num_matches ) {
-                    # we have a match, so we 
-                    # decrement the line count
-                    # by the number of matches ...
-                    $line_count -= $num_matches;
-                }
+    my ($self, %args) = @_;
+    
+    my $write_header = sub {
+        my ($in, $out, $lines, $args) = @_;
+        
+        my $line_count = scalar @{ $lines };
+        
+        if ( $args->{operation} eq 'delete' ) {
+            my $num_matches = grep /$args->{pattern}/, @$lines;
+            if ( $num_matches ) {
+                # we have a match, so we 
+                # decrement the line count
+                # by the number of matches ...
+                $line_count -= $num_matches;
             }
-            elsif ( $args->{operation} eq 'insert' ) {
-                # inserts always increment by one ...
-                $line_count++;
-            }
-            
-            $self->_write_package_file_header( $out, $line_count ); 
-        }, 
-        @_,
-    );
+        }
+        elsif ( $args->{operation} eq 'insert' ) {
+            # inserts always increment by one ...
+            $line_count++;
+        }
+        
+        $self->_write_package_file_header( $out, $line_count ); 
+    };
+    
+    if ( my $pre_hook = $args{pre} ) {
+        $args{pre} = sub { $write_header->( @_ ), $pre_hook->( @_ ) };
+    }
+    else {
+        $args{pre} = $write_header->( @_ );
+    }
+    
+    $self->SUPER::write_changes_to_file( %args );
 }
 
 # ... abstract methods
