@@ -42,6 +42,23 @@ sub   pack_data_into_line;
 
 ## ...
 
+sub count {
+    my ($self, $pattern) = @_;
+    
+    my $fh = $self->open_file_for_reading( $self->{file} );
+    
+    my $count = 0;
+    while ( my $line = $fh->getline ) {
+        next unless $line;
+        next if $pattern && $line !~ m/$pattern/;
+        $count++;
+    }
+    
+    $fh->close;
+    
+    return $count;
+}
+
 sub select {
     my ($self, $pattern) = @_;
     

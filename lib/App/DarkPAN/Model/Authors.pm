@@ -10,6 +10,15 @@ use parent 'App::DarkPAN::Model::Core::CompressedDataFile';
 
 ## ... overridden methods 
 
+sub count {
+    my ($self, $key, $pattern) = @_;
+    return $self->SUPER::count( 
+        ($key && $pattern)
+            ? $self->_regexp_match_builder( $key, $pattern ) 
+            : ()
+    );
+}
+
 sub select {
     my ($self, $key, $pattern) = @_;
     return $self->SUPER::select( 
