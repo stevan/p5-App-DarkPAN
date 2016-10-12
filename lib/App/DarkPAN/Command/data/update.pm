@@ -1,4 +1,4 @@
-package App::DarkPAN::Command::data::upsert;
+package App::DarkPAN::Command::data::update;
 
 use strict;
 use warnings;
@@ -14,15 +14,19 @@ use App::DarkPAN -command;
 
 =pod
 
-darkpan data/upsert 
+darkpan data/update
     --into     authors    # look in authers
     --where    pauseid    # match against the pauseid field
     --matches  STEV[EA]N  # use this as a regexp to match against
     --data     '{"pauseid":"STEVAN", ...}'
-
+    # or ...
+    -- '{"pauseid":"STEVAN", ...}'
+    # or ...
+    < STEVAN.json
+    
 =cut
 
-sub command_names { 'data/upsert' }
+sub command_names { 'data/update' }
 
 sub opt_spec {
     my ($class) = @_;
@@ -32,7 +36,7 @@ sub opt_spec {
         [ 'where=s',   'the key to match on'             => { required => 1 } ],
         [ 'matches=s', 'the regexp to match with'        => { required => 1 } ],
         [],
-        [ 'data=s',    'a JSON string of the new data'   => { required => 1 } ],
+        [ 'data=s',    'a JSON string of the new data' ],
         [],
         $class->SUPER::opt_spec,
     )
@@ -51,6 +55,17 @@ sub execute {
     my $where   = $opt->where;
     my $matches = $opt->matches;
     my $json    = $opt->data;
+    if ( not defined $json ) {
+        if ( @$args && $args->[0] eq '--' ) {
+            $json = join '' => @{$args}[ 1 .. $#{$args} ];
+        }
+        else {
+            $json = join '' => <STDIN>;
+        }    
+    }
+    
+    die "You must supply data to update with using --data, -- or STDIN"
+        unless $json;
 
     my $model = App::DarkPAN::Model->new( root => $root );
     
@@ -62,7 +77,7 @@ sub execute {
 
     my $m = $model->$into();
     
-    $m->upsert( $data, $where, $matches );
+    $m->update( $data, $where, $matches );
 }
 
 1;
