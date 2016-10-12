@@ -63,12 +63,19 @@ sub select {
 sub insert {
     my ($self, $data) = @_;
     
+    my $new_line = $self->pack_data_into_line( $data );
+    
     $self->write_changes_to_file(
         operation => 'insert',
+        pre  => sub {
+            my ($in, $out, $lines, $args) = @_;
+            die "Cannot insert duplicate record:\n\t${new_line}"
+                if scalar grep $_ eq $new_line, @$lines;
+        },
         post => sub {
             my ($in, $out, $lines, $args) = @_;
             # just append this to the end of the document ...
-            $out->print( $self->pack_data_into_line( $data ) );
+            $out->print( $new_line );
         }
     );
     
