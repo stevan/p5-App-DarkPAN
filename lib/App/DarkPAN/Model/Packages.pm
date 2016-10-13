@@ -95,7 +95,7 @@ sub write_changes_to_file {
         $args{pre} = sub { my @args = @_; $write_header->( @args ), $pre_hook->( @args ) };
     }
     else {
-        $args{pre} = $write_header->( @_ );
+        $args{pre} = $write_header;
     }
     
     $self->SUPER::write_changes_to_file( %args );
